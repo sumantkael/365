@@ -1,20 +1,20 @@
 [Setup]
 AppId={{D37B4A4B-4E38-4394-813F-725B02AC17B9}
-AppName=Day
+AppName=365 by L’ÆVOR STUDIO
 AppVersion=1.0.0
 AppPublisher=L’ÆVOR STUDIO
 AppPublisherURL=https://www.instagram.com/leavorstudio/
 AppSupportURL=https://www.instagram.com/leavorstudio/
 AppUpdatesURL=https://www.instagram.com/leavorstudio/
-DefaultDirName={autopf}\Day
-DefaultGroupName=Day
+DefaultDirName={autopf}\365
+DefaultGroupName=365 by L’ÆVOR STUDIO
 SetupIconFile=assets\app_icon.ico
-UninstallDisplayName=Day — Wallpaper Utility (by L’ÆVOR STUDIO)
+UninstallDisplayName=365 by L’ÆVOR STUDIO
 UninstallDisplayIcon={app}\Day.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=dist\installer
-OutputBaseFilename=Day-Setup-1.0.0
+OutputBaseFilename=365-Setup-1.0.0
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 
@@ -26,8 +26,8 @@ Source: "assets\fonts\PlusJakartaSans-Bold.ttf"; DestDir: "{autofonts}"; FontIns
 Source: "assets\fonts\PlusJakartaSans-Medium.ttf"; DestDir: "{autofonts}"; FontInstall: "Plus Jakarta Sans Medium"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Icons]
-Name: "{autoprograms}\Day"; Filename: "{app}\Day.exe"
-Name: "{autodesktop}\Day"; Filename: "{app}\Day.exe"; Tasks: desktopicon
+Name: "{autoprograms}\365 by L’ÆVOR STUDIO"; Filename: "{app}\Day.exe"
+Name: "{autodesktop}\365 by L’ÆVOR STUDIO"; Filename: "{app}\Day.exe"; Tasks: desktopicon
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -35,7 +35,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Run]
 Filename: "{app}\Day.exe"; Parameters: "--setup-scheduler"; Flags: runhidden
 Filename: "{app}\Day.exe"; Parameters: "--update"; Flags: runhidden
-Filename: "{app}\Day.exe"; Description: "{cm:LaunchProgram,Day}"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\Day.exe"; Description: "{cm:LaunchProgram,365 by L’ÆVOR STUDIO}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 Filename: "schtasks"; Parameters: "/delete /tn DayDailyWallpaper /f"; Flags: runhidden

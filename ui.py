@@ -29,7 +29,7 @@ UI_THEME = {
 class DaySettingsApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Day — Wallpaper Settings")
+        self.title("365 — by L’ÆVOR STUDIO")
         self.geometry("540x690")
         self.minsize(500, 650)
         
@@ -88,8 +88,8 @@ class DaySettingsApp(tk.Tk):
 
         title = tk.Label(
             header,
-            text="Day",
-            font=(self.font_family, 22, "bold"),
+            text="365",
+            font=(self.font_family, 24, "bold"),
             fg=UI_THEME["text_main"],
             bg=UI_THEME["bg"]
         )

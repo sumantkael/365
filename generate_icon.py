@@ -2,7 +2,7 @@ from PIL import Image
 from pathlib import Path
 import shutil
 
-SOURCE_IMG = Path(r"C:\Users\User\.gemini\antigravity-ide\brain\e46ee1ba-ccff-4725-85fa-e42faac989ac\.user_uploaded\media_1789606576491.png")
+SOURCE_IMG = Path(r"C:\Users\User\.gemini\antigravity-ide\brain\e46ee1ba-ccff-4725-85fa-e42faac989ac\.user_uploaded\media_1789607206676.png")
 ASSETS_DIR = Path(__file__).parent / "assets"
 ASSETS_DIR.mkdir(parents=True, exist_ok=True)
 

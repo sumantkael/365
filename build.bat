@@ -140,7 +140,7 @@ if defined ISCC_EXE (
     "%ISCC_EXE%" installer.iss
     echo.
     echo Setup installer created successfully at:
-    echo dist\installer\Day-Setup-1.0.0.exe
+    echo dist\installer\365-Setup-1.0.0.exe
 ) else (
     echo.
     echo [NOTE] Inno Setup compiler was not found.
