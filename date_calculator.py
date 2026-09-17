@@ -9,6 +9,8 @@ class DateStats:
         self.is_leap_year = calendar.isleap(self.year)
         self.total_days = 366 if self.is_leap_year else 365
         self.days_remaining = self.total_days - self.day_of_year
+        self.percentage_elapsed = round((self.day_of_year / self.total_days) * 100)
+        self.percentage_remaining = 100 - self.percentage_elapsed
 
     def to_dict(self):
         return {
@@ -17,12 +19,14 @@ class DateStats:
             "is_leap_year": self.is_leap_year,
             "total_days": self.total_days,
             "days_remaining": self.days_remaining,
+            "percentage_elapsed": self.percentage_elapsed,
+            "percentage_remaining": self.percentage_remaining,
         }
 
     def __repr__(self):
         return (
             f"<DateStats year={self.year} day={self.day_of_year}/{self.total_days} "
-            f"remaining={self.days_remaining} leap={self.is_leap_year}>"
+            f"({self.percentage_elapsed}%) remaining={self.days_remaining} leap={self.is_leap_year}>"
         )
 
 

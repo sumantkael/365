@@ -63,7 +63,7 @@ echo [OK] Located Python: "!PY_EXE!"
 "!PY_EXE!" --version
 echo.
 
-echo [1/4] Installing / Updating Pillow and PyInstaller...
+echo [1/6] Installing / Updating Pillow and PyInstaller...
 "!PY_EXE!" -m pip install --upgrade pillow pyinstaller
 if !ERRORLEVEL! neq 0 (
     echo.
@@ -90,11 +90,11 @@ if !ERRORLEVEL! neq 0 (
 )
 
 echo.
-echo [3/4] Generating test preview wallpapers...
+echo [5/6] Generating test preview wallpapers...
 "!PY_EXE!" test_render.py
 
 echo.
-echo [4/4] Compiling Day.exe using PyInstaller...
+echo [6/6] Compiling Day.exe using PyInstaller...
 "!PY_EXE!" -m PyInstaller --clean --noconfirm day.spec
 if !ERRORLEVEL! neq 0 (
     echo [ERROR] PyInstaller compilation failed.
@@ -132,19 +132,26 @@ if not defined ISCC_EXE (
     if exist "%LOCALAPPDATA%\Programs\Inno Setup 6\iscc.exe" set "ISCC_EXE=%LOCALAPPDATA%\Programs\Inno Setup 6\iscc.exe"
 )
 
+:: Read version from VERSION file if present, else default to 1.1.0
+set "APP_VERSION=1.1.0"
+if exist "VERSION" (
+    set /p APP_VERSION=<VERSION
+    set "APP_VERSION=!APP_VERSION: =!"
+)
+
 if defined ISCC_EXE (
     echo.
     echo ========================================================
-    echo   Compiling Windows Setup Installer with Inno Setup...
+    echo   Compiling Windows Setup Installer v!APP_VERSION! with Inno Setup...
     echo ========================================================
-    "%ISCC_EXE%" installer.iss
+    "%ISCC_EXE%" /DMyAppVersion="!APP_VERSION!" installer.iss
     echo.
     echo Setup installer created successfully at:
-    echo dist\installer\365-Setup-1.0.0.exe
+    echo dist\installer\365-Setup-!APP_VERSION!.exe
 ) else (
     echo.
     echo [NOTE] Inno Setup compiler was not found.
-    echo To compile Day-Setup-1.0.0.exe, please install Inno Setup:
+    echo To compile the setup installer, please install Inno Setup:
     echo https://jrsoftware.org/isdl.php
 )
 

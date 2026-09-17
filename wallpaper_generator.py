@@ -71,7 +71,8 @@ def render_wallpaper(
     mode: str = "both",
     theme: str = "dark",
     show_text: bool = True,
-    show_dots: bool = False
+    show_dots: bool = False,
+    show_percentage: bool = True
 ) -> Image.Image:
     """
     Renders wallpaper using 4x Supersampling Anti-Aliasing (SSAA)
@@ -91,21 +92,23 @@ def render_wallpaper(
     render_dots = show_dots or (mode == "dots")
     render_text = show_text if mode != "dots" else show_text
 
+    pct_str = f"{stats.percentage_elapsed}%"
+
     if mode == "day_of_year":
         primary_text = str(stats.day_of_year)
-        secondary_text = f"OF {stats.total_days}"
+        secondary_text = f"OF {stats.total_days} • {pct_str}" if show_percentage else f"OF {stats.total_days}"
     elif mode == "days_remaining":
         primary_text = str(stats.days_remaining)
-        secondary_text = "DAYS LEFT"
+        secondary_text = f"DAYS LEFT • {pct_str} OVER" if show_percentage else "DAYS LEFT"
     elif mode == "both":
         primary_text = f"DAY {stats.day_of_year}"
-        secondary_text = f"{stats.days_remaining} DAYS LEFT"
+        secondary_text = f"{stats.days_remaining} DAYS LEFT • {pct_str}" if show_percentage else f"{stats.days_remaining} DAYS LEFT"
     elif mode == "dots":
         primary_text = f"{stats.day_of_year} / {stats.total_days}"
-        secondary_text = f"{stats.days_remaining} DAYS REMAINING"
+        secondary_text = f"{stats.days_remaining} DAYS REMAINING • {pct_str}" if show_percentage else f"{stats.days_remaining} DAYS REMAINING"
     else:
         primary_text = str(stats.day_of_year)
-        secondary_text = f"{stats.days_remaining} DAYS LEFT"
+        secondary_text = f"{stats.days_remaining} DAYS LEFT • {pct_str}" if show_percentage else f"{stats.days_remaining} DAYS LEFT"
 
     base_unit = (target_height / 1080.0) * scale
 

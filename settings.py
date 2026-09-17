@@ -7,6 +7,7 @@ DEFAULT_SETTINGS = {
     "theme": "dark",       # "dark", "light"
     "show_text": True,
     "show_dots": False,
+    "show_percentage": True,
     "auto_update": True,
 }
 

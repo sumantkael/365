@@ -1,7 +1,11 @@
+#ifndef MyAppVersion
+#define MyAppVersion "1.1.0"
+#endif
+
 [Setup]
 AppId={{D37B4A4B-4E38-4394-813F-725B02AC17B9}
 AppName=365 by L’ÆVOR STUDIO
-AppVersion=1.0.0
+AppVersion={#MyAppVersion}
 AppPublisher=L’ÆVOR STUDIO
 AppPublisherURL=https://www.instagram.com/leavorstudio/
 AppSupportURL=https://www.instagram.com/leavorstudio/
@@ -14,7 +18,7 @@ UninstallDisplayIcon={app}\Day.exe
 Compression=lzma2
 SolidCompression=yes
 OutputDir=dist\installer
-OutputBaseFilename=365-Setup-1.0.0
+OutputBaseFilename=365-Setup-{#MyAppVersion}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 
@@ -40,3 +44,4 @@ Filename: "{app}\Day.exe"; Description: "{cm:LaunchProgram,365 by L’ÆVOR STUD
 [UninstallRun]
 Filename: "schtasks"; Parameters: "/delete /tn DayDailyWallpaper /f"; Flags: runhidden
 Filename: "schtasks"; Parameters: "/delete /tn DayDailyWallpaper_Logon /f"; Flags: runhidden
+Filename: "reg"; Parameters: "delete ""HKCU\Software\Microsoft\Windows\CurrentVersion\Run"" /v ""365DailyWallpaperUpdate"" /f"; Flags: runhidden

@@ -45,6 +45,22 @@ class TestDateCalculator(unittest.TestCase):
         # Jan(31)+Feb(28)+Mar(31)+Apr(30)+May(31)+Jun(30)+2 = 183
         self.assertEqual(stats.day_of_year, 183)
         self.assertEqual(stats.days_remaining, 365 - 183)
+        self.assertEqual(stats.percentage_elapsed, 50)
+        self.assertEqual(stats.percentage_remaining, 50)
+
+    def test_percentage_progression(self):
+        # Jan 1: 1 / 365 = ~0%
+        stats_start = get_date_stats(date(2025, 1, 1))
+        self.assertEqual(stats_start.percentage_elapsed, 0)
+        
+        # Day 105 in 365-day year: 105 / 365 = 28.76% -> 29%
+        stats_105 = get_date_stats(date(2025, 4, 15))
+        self.assertEqual(stats_105.day_of_year, 105)
+        self.assertEqual(stats_105.percentage_elapsed, 29)
+
+        # Dec 31: 365 / 365 = 100%
+        stats_end = get_date_stats(date(2025, 12, 31))
+        self.assertEqual(stats_end.percentage_elapsed, 100)
 
 if __name__ == "__main__":
     unittest.main()

@@ -46,9 +46,11 @@ def main():
     # Check for Inno Setup (iscc)
     iscc = shutil.which("iscc")
     if iscc:
-        print("\n--- 5. Compiling Inno Setup Installer ---")
-        subprocess.run([iscc, "installer.iss"])
-        installer_path = cwd / "dist" / "installer" / "Day-Setup-1.0.0.exe"
+        version_file = cwd / "VERSION"
+        version = version_file.read_text(encoding="utf-8").strip() if version_file.exists() else "1.1.0"
+        print(f"\n--- 5. Compiling Inno Setup Installer v{version} ---")
+        subprocess.run([iscc, f"/DMyAppVersion={version}", "installer.iss"])
+        installer_path = cwd / "dist" / "installer" / f"365-Setup-{version}.exe"
         if installer_path.exists():
             print(f"Installer ready at: {installer_path}")
     else:

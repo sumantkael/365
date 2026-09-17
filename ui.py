@@ -47,7 +47,12 @@ class DaySettingsApp(tk.Tk):
         self.theme_var = tk.StringVar(value=self.settings.get("theme", "dark"))
         self.show_text_var = tk.BooleanVar(value=self.settings.get("show_text", True))
         self.show_dots_var = tk.BooleanVar(value=self.settings.get("show_dots", False))
+        self.show_percentage_var = tk.BooleanVar(value=self.settings.get("show_percentage", True))
         self.auto_update_var = tk.BooleanVar(value=self.settings.get("auto_update", True))
+
+        # Auto-ensure daily background refresh is registered silently if enabled
+        if self.auto_update_var.get():
+            register_daily_task()
 
         self.preview_image_tk = None
         self._build_ui()
@@ -97,7 +102,7 @@ class DaySettingsApp(tk.Tk):
 
         subtitle = tk.Label(
             header,
-            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.days_remaining} remaining",
+            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed • {self.stats.days_remaining} remaining",
             font=(self.font_family, 10),
             fg=UI_THEME["text_muted"],
             bg=UI_THEME["bg"]
@@ -234,7 +239,14 @@ class DaySettingsApp(tk.Tk):
             command=self.on_setting_changed, bg=UI_THEME["card"], fg=UI_THEME["text_main"],
             selectcolor=UI_THEME["bg"], activebackground=UI_THEME["card"], font=(self.font_family, 9), bd=0
         )
-        dots_cb.pack(side="left")
+        dots_cb.pack(side="left", padx=(0, 14))
+
+        pct_cb = tk.Checkbutton(
+            visual_row, text="Show Progress (%)", variable=self.show_percentage_var,
+            command=self.on_setting_changed, bg=UI_THEME["card"], fg=UI_THEME["text_main"],
+            selectcolor=UI_THEME["bg"], activebackground=UI_THEME["card"], font=(self.font_family, 9), bd=0
+        )
+        pct_cb.pack(side="left")
 
         # Section 3: Daily Task Scheduler Toggle
         sched_frame = tk.Frame(inner, bg=UI_THEME["bg"], bd=0)
@@ -259,7 +271,8 @@ class DaySettingsApp(tk.Tk):
             mode=self.mode_var.get(),
             theme=self.theme_var.get(),
             show_text=self.show_text_var.get(),
-            show_dots=self.show_dots_var.get()
+            show_dots=self.show_dots_var.get(),
+            show_percentage=self.show_percentage_var.get()
         )
         self.update_preview()
 
@@ -269,11 +282,13 @@ class DaySettingsApp(tk.Tk):
         if enabled:
             ok = register_daily_task()
             if not ok:
-                messagebox.showwarning("Task Scheduler", "Could not register task with Windows Task Scheduler. You may need to run with appropriate permissions.")
+                messagebox.showwarning("Auto-Refresh", "Could not register daily background tasks. You may need to run with appropriate permissions.")
         else:
             unregister_daily_task()
 
     def update_preview(self):
+        # Refresh current stats in case date changed while app was open
+        self.stats = get_date_stats()
         # Generate smaller image for preview (480 x 270 is 16:9)
         preview_img = render_wallpaper(
             stats=self.stats,
@@ -281,12 +296,18 @@ class DaySettingsApp(tk.Tk):
             mode=self.mode_var.get(),
             theme=self.theme_var.get(),
             show_text=self.show_text_var.get(),
-            show_dots=self.show_dots_var.get()
+            show_dots=self.show_dots_var.get(),
+            show_percentage=self.show_percentage_var.get()
         )
         self.preview_image_tk = ImageTk.PhotoImage(preview_img)
         self.preview_canvas.configure(image=self.preview_image_tk)
 
     def apply_wallpaper(self):
+        # Always ensure auto-update is active if the user has auto-update enabled
+        if self.auto_update_var.get():
+            register_daily_task()
+
+        self.stats = get_date_stats()
         resolution = get_screen_resolution()
         wallpaper_img = render_wallpaper(
             stats=self.stats,
@@ -294,13 +315,14 @@ class DaySettingsApp(tk.Tk):
             mode=self.mode_var.get(),
             theme=self.theme_var.get(),
             show_text=self.show_text_var.get(),
-            show_dots=self.show_dots_var.get()
+            show_dots=self.show_dots_var.get(),
+            show_percentage=self.show_percentage_var.get()
         )
         cache_path = get_wallpaper_cache_path()
         wallpaper_img.save(cache_path, "PNG")
         
         success = set_desktop_wallpaper(cache_path)
         if success:
-            messagebox.showinfo("Success", "Desktop wallpaper updated successfully!")
+            messagebox.showinfo("Success", "Desktop wallpaper updated successfully!\n\nAutomatic daily refresh is active.")
         else:
             messagebox.showerror("Error", "Failed to update desktop wallpaper.")

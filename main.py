@@ -18,7 +18,8 @@ def update_wallpaper_headless() -> bool:
         mode=settings.get("mode", "both"),
         theme=settings.get("theme", "dark"),
         show_text=settings.get("show_text", True),
-        show_dots=settings.get("show_dots", False)
+        show_dots=settings.get("show_dots", False),
+        show_percentage=settings.get("show_percentage", True)
     )
 
     cache_path = get_wallpaper_cache_path()
