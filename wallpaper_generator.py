@@ -72,17 +72,17 @@ def render_wallpaper(
     theme: str = "dark",
     show_text: bool = True,
     show_dots: bool = False,
-    show_percentage: bool = True
+    show_percentage: bool = True,
+    fast_preview: bool = False
 ) -> Image.Image:
     """
-    Renders wallpaper using 4x Supersampling Anti-Aliasing (SSAA)
-    for SVG-quality, silky-smooth circles without jagged pixelation.
+    Renders wallpaper. Uses 4x SSAA for final wallpaper, or 1x direct drawing for fast UI preview.
     """
     palette = PALETTES.get(theme, PALETTES["dark"])
     target_width, target_height = resolution
 
-    # 4x Supersampling: render at 4x canvas resolution then downscale with high-quality LANCZOS resampling
-    scale = 4
+    # 4x Supersampling for ultra-sharp wallpapers, 1x for instant UI previews
+    scale = 1 if fast_preview else 4
     w = target_width * scale
     h = target_height * scale
 
@@ -212,5 +212,7 @@ def render_wallpaper(
                 anchor="mm"
             )
 
-    # High-quality Lanczos downsampling eliminates all pixelation, giving true vector/SVG sharpness
-    return img.resize((target_width, target_height), resample=Image.Resampling.LANCZOS)
+    # Downsample if supersampled; return directly if fast preview
+    if scale > 1:
+        return img.resize((target_width, target_height), resample=Image.Resampling.LANCZOS)
+    return img

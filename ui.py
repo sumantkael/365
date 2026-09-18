@@ -26,12 +26,27 @@ UI_THEME = {
     "btn_active_fg": "#0A0A0B",
 }
 
+import threading
+
+# Enable Per-Monitor DPI Awareness before Tk initializes for crisp rendering on high-DPI displays
+try:
+    import ctypes
+    ctypes.windll.shcore.SetProcessDpiAwareness(1) # PROCESS_SYSTEM_DPI_AWARE or 2 for PER_MONITOR
+except Exception:
+    try:
+        import ctypes
+        ctypes.windll.user32.SetProcessDPIAware()
+    except Exception:
+        pass
+
 class DaySettingsApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("365 — by L’ÆVOR STUDIO")
-        self.geometry("540x690")
-        self.minsize(500, 650)
+        
+        # Responsive, comfortable default size that works across 1080p, 1440p and 4K displays
+        self.geometry("640x780")
+        self.minsize(580, 700)
         
         # Consistent Deep Dark Background across the entire window
         self.configure(bg=UI_THEME["bg"])
@@ -50,13 +65,16 @@ class DaySettingsApp(tk.Tk):
         self.show_percentage_var = tk.BooleanVar(value=self.settings.get("show_percentage", True))
         self.auto_update_var = tk.BooleanVar(value=self.settings.get("auto_update", True))
 
-        # Auto-ensure daily background refresh is registered silently if enabled
+        # Auto-ensure daily background refresh asynchronously to NEVER freeze app startup
         if self.auto_update_var.get():
-            register_daily_task()
+            threading.Thread(target=register_daily_task, daemon=True).start()
 
         self.preview_image_tk = None
         self._build_ui()
         self.update_preview()
+
+        # Auto-refresh date & percentage periodically (every 60 seconds)
+        self._schedule_periodic_refresh()
 
     def _load_ui_fonts(self):
         """Register Plus Jakarta Sans font with Windows GDI so Tkinter can use it."""
@@ -100,14 +118,14 @@ class DaySettingsApp(tk.Tk):
         )
         title.pack(anchor="w")
 
-        subtitle = tk.Label(
+        self.subtitle_lbl = tk.Label(
             header,
-            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed • {self.stats.days_remaining} remaining",
+            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed ({self.stats.percentage_elapsed_exact:.1f}%) • {self.stats.days_remaining} remaining",
             font=(self.font_family, 10),
             fg=UI_THEME["text_muted"],
             bg=UI_THEME["bg"]
         )
-        subtitle.pack(anchor="w", pady=(2, 0))
+        self.subtitle_lbl.pack(anchor="w", pady=(2, 0))
 
         # 2. Bottom Action Bar (Docked first to guarantee visibility)
         bottom_bar = tk.Frame(self, bg=UI_THEME["bg"])
@@ -276,20 +294,34 @@ class DaySettingsApp(tk.Tk):
         )
         self.update_preview()
 
+    def _schedule_periodic_refresh(self):
+        """Silently refreshes date calculations and stats every 60 seconds without hanging."""
+        self.update_preview()
+        self.after(60000, self._schedule_periodic_refresh)
+
     def on_scheduler_toggled(self):
         enabled = self.auto_update_var.get()
         self.settings.set("auto_update", enabled)
-        if enabled:
-            ok = register_daily_task()
-            if not ok:
-                messagebox.showwarning("Auto-Refresh", "Could not register daily background tasks. You may need to run with appropriate permissions.")
-        else:
-            unregister_daily_task()
+        def _bg_task():
+            if enabled:
+                ok = register_daily_task()
+                if not ok:
+                    self.after(0, lambda: messagebox.showwarning("Auto-Refresh", "Could not register daily background tasks. You may need to run with appropriate permissions."))
+            else:
+                unregister_daily_task()
+        threading.Thread(target=_bg_task, daemon=True).start()
 
     def update_preview(self):
         # Refresh current stats in case date changed while app was open
         self.stats = get_date_stats()
-        # Generate smaller image for preview (480 x 270 is 16:9)
+        
+        # Update header subtitle if widget exists
+        if hasattr(self, "subtitle_lbl"):
+            self.subtitle_lbl.config(
+                text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed ({self.stats.percentage_elapsed_exact:.1f}%) • {self.stats.days_remaining} remaining"
+            )
+
+        # Generate fast preview image (480 x 270 is 16:9) with fast_preview=True to keep UI snappy
         preview_img = render_wallpaper(
             stats=self.stats,
             resolution=(480, 270),
@@ -297,7 +329,8 @@ class DaySettingsApp(tk.Tk):
             theme=self.theme_var.get(),
             show_text=self.show_text_var.get(),
             show_dots=self.show_dots_var.get(),
-            show_percentage=self.show_percentage_var.get()
+            show_percentage=self.show_percentage_var.get(),
+            fast_preview=True
         )
         self.preview_image_tk = ImageTk.PhotoImage(preview_img)
         self.preview_canvas.configure(image=self.preview_image_tk)
@@ -305,10 +338,12 @@ class DaySettingsApp(tk.Tk):
     def apply_wallpaper(self):
         # Always ensure auto-update is active if the user has auto-update enabled
         if self.auto_update_var.get():
-            register_daily_task()
+            threading.Thread(target=register_daily_task, daemon=True).start()
 
         self.stats = get_date_stats()
         resolution = get_screen_resolution()
+        
+        # High quality 4x SSAA render for the actual desktop wallpaper
         wallpaper_img = render_wallpaper(
             stats=self.stats,
             resolution=resolution,
@@ -316,7 +351,8 @@ class DaySettingsApp(tk.Tk):
             theme=self.theme_var.get(),
             show_text=self.show_text_var.get(),
             show_dots=self.show_dots_var.get(),
-            show_percentage=self.show_percentage_var.get()
+            show_percentage=self.show_percentage_var.get(),
+            fast_preview=False
         )
         cache_path = get_wallpaper_cache_path()
         wallpaper_img.save(cache_path, "PNG")

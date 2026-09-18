@@ -9,8 +9,10 @@ class DateStats:
         self.is_leap_year = calendar.isleap(self.year)
         self.total_days = 366 if self.is_leap_year else 365
         self.days_remaining = self.total_days - self.day_of_year
-        self.percentage_elapsed = round((self.day_of_year / self.total_days) * 100)
-        self.percentage_remaining = 100 - self.percentage_elapsed
+        self.percentage_elapsed_exact = (self.day_of_year / self.total_days) * 100
+        self.percentage_elapsed = round(self.percentage_elapsed_exact)
+        self.percentage_remaining_exact = 100 - self.percentage_elapsed_exact
+        self.percentage_remaining = round(self.percentage_remaining_exact)
 
     def to_dict(self):
         return {
