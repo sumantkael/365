@@ -120,7 +120,7 @@ class DaySettingsApp(tk.Tk):
 
         self.subtitle_lbl = tk.Label(
             header,
-            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed ({self.stats.percentage_elapsed_exact:.1f}%) • {self.stats.days_remaining} remaining",
+            text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed_exact:.1f}% Completed • {self.stats.days_remaining} remaining",
             font=(self.font_family, 10),
             fg=UI_THEME["text_muted"],
             bg=UI_THEME["bg"]
@@ -318,7 +318,7 @@ class DaySettingsApp(tk.Tk):
         # Update header subtitle if widget exists
         if hasattr(self, "subtitle_lbl"):
             self.subtitle_lbl.config(
-                text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed}% Completed ({self.stats.percentage_elapsed_exact:.1f}%) • {self.stats.days_remaining} remaining"
+                text=f"Year {self.stats.year} • Day {self.stats.day_of_year} of {self.stats.total_days} • {self.stats.percentage_elapsed_exact:.1f}% Completed • {self.stats.days_remaining} remaining"
             )
 
         # Generate fast preview image (480 x 270 is 16:9) with fast_preview=True to keep UI snappy

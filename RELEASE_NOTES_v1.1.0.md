@@ -33,13 +33,14 @@ Previously, users had to launch the application and click "Apply" to roll over t
 - **Silent & Zero Background Resource Usage**: Runs completely offline, updates in milliseconds, and closes immediately. It consumes **0% CPU and 0 MB RAM** while you work.
 
 #### 2. 📊 Minimalist Year Progress (%) Indicator
-Stay mindful of time with a subtle, clean year percentage counter (e.g. `29%`, `71%`, `72%`):
+Stay mindful of time with a subtle, clean year percentage counter with 1 decimal precision (e.g. `28.8%`, `71.2%`, `72.1%`):
 - Cleanly integrated into the typographic hierarchy without cluttering the screen.
+- Shows daily micro-progress instead of remaining static for days.
 - Supported across all wallpaper modes:
-  - **Both**: `DAY 105 • 260 DAYS LEFT • 29%`
-  - **Day of Year**: `105 • OF 365 • 29%`
-  - **Days Left**: `260 • DAYS LEFT • 29% OVER`
-  - **Dots Matrix**: `105 / 365 • 260 DAYS REMAINING • 29%`
+  - **Both**: `DAY 105 • 260 DAYS LEFT • 28.8%`
+  - **Day of Year**: `105 • OF 365 • 28.8%`
+  - **Days Left**: `260 • DAYS LEFT • 28.8% OVER`
+  - **Dots Matrix**: `105 / 365 • 260 DAYS REMAINING • 28.8%`
 - Fully toggleable with a new **"Show Progress (%)"** checkbox in the settings window (enabled by default).
 - Header in the settings app now displays your exact year completion rate in real time.
 

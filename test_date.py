@@ -53,10 +53,11 @@ class TestDateCalculator(unittest.TestCase):
         stats_start = get_date_stats(date(2025, 1, 1))
         self.assertEqual(stats_start.percentage_elapsed, 0)
         
-        # Day 105 in 365-day year: 105 / 365 = 28.76% -> 29%
+        # Day 105 in 365-day year: 105 / 365 = 28.76% -> 29%, 28.8%
         stats_105 = get_date_stats(date(2025, 4, 15))
         self.assertEqual(stats_105.day_of_year, 105)
         self.assertEqual(stats_105.percentage_elapsed, 29)
+        self.assertEqual(f"{stats_105.percentage_elapsed_exact:.1f}%", "28.8%")
 
         # Dec 31: 365 / 365 = 100%
         stats_end = get_date_stats(date(2025, 12, 31))

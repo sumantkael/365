@@ -92,7 +92,7 @@ def render_wallpaper(
     render_dots = show_dots or (mode == "dots")
     render_text = show_text if mode != "dots" else show_text
 
-    pct_str = f"{stats.percentage_elapsed}%"
+    pct_str = f"{stats.percentage_elapsed_exact:.1f}%"
 
     if mode == "day_of_year":
         primary_text = str(stats.day_of_year)
