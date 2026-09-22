@@ -4,11 +4,16 @@ from pathlib import Path
 
 DEFAULT_SETTINGS = {
     "mode": "both",        # "day_of_year", "days_remaining", "both", "dots"
-    "theme": "dark",       # "dark", "light"
+    "theme": "light",      # "light", "dark"
     "show_text": True,
     "show_dots": False,
     "show_percentage": True,
     "auto_update": True,
+    "date_mode": "year",   # "year" (standard 365) or "custom" (countdown to date)
+    "wallpaper_font": "geist", # "geist" or "instrument_serif"
+    "target_date": "",     # e.g. "2027-01-21" or "21st of January 2027"
+    "target_start_date": "", # e.g. "2025-01-01"
+    "target_title": "",    # e.g. "Exam"
 }
 
 def get_app_dir() -> Path:

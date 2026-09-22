@@ -73,7 +73,7 @@ if !ERRORLEVEL! neq 0 (
 )
 
 echo.
-echo [2/6] Downloading premium typography font (Plus Jakarta Sans)...
+echo [2/6] Downloading premium typography fonts (Geist & Instrument Serif)...
 "!PY_EXE!" download_fonts.py
 
 echo.

@@ -9,17 +9,34 @@ from scheduler import register_daily_task, is_task_scheduled
 def update_wallpaper_headless() -> bool:
     """Headless wallpaper generation and application (called by Windows Task Scheduler)."""
     settings = SettingsManager()
-    stats = get_date_stats()
+    
+    date_mode = settings.get("date_mode", "year")
+    custom_target = None
+    custom_start = None
+    if date_mode == "custom":
+        from date_calculator import parse_user_date
+        target_str = settings.get("target_date", "")
+        start_str = settings.get("target_start_date", "")
+        custom_target = parse_user_date(target_str)
+        custom_start = parse_user_date(start_str)
+
+    stats = get_date_stats(
+        date_mode=date_mode,
+        custom_target_date=custom_target,
+        custom_start_date=custom_start,
+        event_title=settings.get("target_title", "")
+    )
     resolution = get_screen_resolution()
 
     wallpaper_img = render_wallpaper(
         stats=stats,
         resolution=resolution,
         mode=settings.get("mode", "both"),
-        theme=settings.get("theme", "dark"),
+        theme=settings.get("theme", "light"),
         show_text=settings.get("show_text", True),
         show_dots=settings.get("show_dots", False),
-        show_percentage=settings.get("show_percentage", True)
+        show_percentage=settings.get("show_percentage", True),
+        wallpaper_font=settings.get("wallpaper_font", "geist")
     )
 
     cache_path = get_wallpaper_cache_path()

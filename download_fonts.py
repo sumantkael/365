@@ -4,11 +4,15 @@ from pathlib import Path
 FONTS_DIR = Path(__file__).parent / "assets" / "fonts"
 FONTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Clean, modern Plus Jakarta Sans font from Google Fonts / Tokotype repo
+# Wallpaper Typography: Geist & Instrument Serif
 URLS = {
-    "PlusJakartaSans-Bold.ttf": "https://raw.githubusercontent.com/tokotype/PlusJakartaSans/master/fonts/ttf/PlusJakartaSans-Bold.ttf",
-    "PlusJakartaSans-Regular.ttf": "https://raw.githubusercontent.com/tokotype/PlusJakartaSans/master/fonts/ttf/PlusJakartaSans-Regular.ttf",
-    "PlusJakartaSans-Medium.ttf": "https://raw.githubusercontent.com/tokotype/PlusJakartaSans/master/fonts/ttf/PlusJakartaSans-Medium.ttf"
+    # 1. Geist Sans
+    "Geist-Variable.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/geist/Geist%5Bwght%5D.ttf",
+    # 2. Geist Mono
+    "GeistMono-Variable.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/geistmono/GeistMono%5Bwght%5D.ttf",
+    # 3. Instrument Serif (Refined Editorial Luxury Serif from Google Fonts)
+    "InstrumentSerif-Regular.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/InstrumentSerif-Regular.ttf",
+    "InstrumentSerif-Italic.ttf": "https://raw.githubusercontent.com/google/fonts/main/ofl/instrumentserif/InstrumentSerif-Italic.ttf",
 }
 
 def download_fonts():
@@ -19,7 +23,7 @@ def download_fonts():
             try:
                 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
                 req = urllib.request.Request(url, headers=headers)
-                with urllib.request.urlopen(req) as resp, open(dest, 'wb') as out:
+                with urllib.request.urlopen(req, timeout=20) as resp, open(dest, 'wb') as out:
                     out.write(resp.read())
                 print(f"Downloaded {name} successfully.")
             except Exception as e:

@@ -1,5 +1,5 @@
 #ifndef MyAppVersion
-#define MyAppVersion "1.1.0"
+#define MyAppVersion "1.2.0"
 #endif
 
 [Setup]
@@ -24,10 +24,9 @@ PrivilegesRequired=lowest
 
 [Files]
 Source: "dist\Day.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "VERSION"; DestDir: "{app}"; Flags: ignoreversion
 Source: "assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "assets\fonts\PlusJakartaSans-Regular.ttf"; DestDir: "{autofonts}"; FontInstall: "Plus Jakarta Sans"; Flags: onlyifdoesntexist uninsneveruninstall
-Source: "assets\fonts\PlusJakartaSans-Bold.ttf"; DestDir: "{autofonts}"; FontInstall: "Plus Jakarta Sans Bold"; Flags: onlyifdoesntexist uninsneveruninstall
-Source: "assets\fonts\PlusJakartaSans-Medium.ttf"; DestDir: "{autofonts}"; FontInstall: "Plus Jakarta Sans Medium"; Flags: onlyifdoesntexist uninsneveruninstall
+Source: "assets\fonts\*"; DestDir: "{autofonts}"; Flags: onlyifdoesntexist uninsneveruninstall
 
 [Icons]
 Name: "{autoprograms}\365 by L’ÆVOR STUDIO"; Filename: "{app}\Day.exe"

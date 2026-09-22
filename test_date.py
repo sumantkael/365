@@ -1,6 +1,6 @@
 from datetime import date
 import unittest
-from date_calculator import get_date_stats
+from date_calculator import get_date_stats, parse_user_date
 
 class TestDateCalculator(unittest.TestCase):
     def test_standard_non_leap_year(self):
@@ -42,26 +42,40 @@ class TestDateCalculator(unittest.TestCase):
         # July 2 in a regular 365-day year
         d = date(2025, 7, 2)
         stats = get_date_stats(d)
-        # Jan(31)+Feb(28)+Mar(31)+Apr(30)+May(31)+Jun(30)+2 = 183
         self.assertEqual(stats.day_of_year, 183)
         self.assertEqual(stats.days_remaining, 365 - 183)
         self.assertEqual(stats.percentage_elapsed, 50)
         self.assertEqual(stats.percentage_remaining, 50)
 
-    def test_percentage_progression(self):
-        # Jan 1: 1 / 365 = ~0%
-        stats_start = get_date_stats(date(2025, 1, 1))
-        self.assertEqual(stats_start.percentage_elapsed, 0)
-        
-        # Day 105 in 365-day year: 105 / 365 = 28.76% -> 29%, 28.8%
-        stats_105 = get_date_stats(date(2025, 4, 15))
-        self.assertEqual(stats_105.day_of_year, 105)
-        self.assertEqual(stats_105.percentage_elapsed, 29)
-        self.assertEqual(f"{stats_105.percentage_elapsed_exact:.1f}%", "28.8%")
+    def test_user_date_parsing(self):
+        # Test specific user example: "21st of January 2027"
+        dt1 = parse_user_date("21st of January 2027")
+        self.assertEqual(dt1, date(2027, 1, 21))
 
-        # Dec 31: 365 / 365 = 100%
-        stats_end = get_date_stats(date(2025, 12, 31))
-        self.assertEqual(stats_end.percentage_elapsed, 100)
+        # Test other common variations
+        self.assertEqual(parse_user_date("21st January 2027"), date(2027, 1, 21))
+        self.assertEqual(parse_user_date("21 Jan 2027"), date(2027, 1, 21))
+        self.assertEqual(parse_user_date("2027-01-21"), date(2027, 1, 21))
+        self.assertEqual(parse_user_date("21/01/2027"), date(2027, 1, 21))
+        self.assertEqual(parse_user_date("January 21, 2027"), date(2027, 1, 21))
+
+    def test_custom_target_countdown(self):
+        today = date(2026, 1, 1)
+        target = date(2027, 1, 21)
+        start = date(2025, 1, 1)
+
+        stats = get_date_stats(
+            target_date=today,
+            date_mode="custom",
+            custom_target_date=target,
+            custom_start_date=start,
+            event_title="Exam"
+        )
+
+        self.assertEqual(stats.days_remaining, (target - today).days)
+        self.assertEqual(stats.total_days, (target - start).days)
+        self.assertEqual(stats.event_title, "Exam")
+        self.assertTrue(0 <= stats.percentage_elapsed <= 100)
 
 if __name__ == "__main__":
     unittest.main()

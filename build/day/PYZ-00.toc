@@ -627,6 +627,7 @@
    'C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\typing.py',
    'PYMODULE'),
   ('ui', 'G:\\E Drive\\Date\\ui.py', 'PYMODULE'),
+  ('updater', 'G:\\E Drive\\Date\\updater.py', 'PYMODULE'),
   ('urllib',
    'C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python313\\Lib\\urllib\\__init__.py',
    'PYMODULE'),
