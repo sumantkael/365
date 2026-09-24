@@ -77,5 +77,41 @@ class TestDateCalculator(unittest.TestCase):
         self.assertEqual(stats.event_title, "Exam")
         self.assertTrue(0 <= stats.percentage_elapsed <= 100)
 
+    def test_custom_target_starting_today(self):
+        # 1 month target starting today
+        today = date(2026, 9, 24)
+        target = date(2026, 10, 24)
+
+        stats = get_date_stats(
+            target_date=today,
+            date_mode="custom",
+            custom_target_date=target,
+            custom_start_date=None,  # defaults to today
+            event_title=""
+        )
+
+        self.assertEqual(stats.days_remaining, 30)
+        self.assertEqual(stats.total_days, 30)
+        self.assertEqual(stats.day_of_year, 1)  # Day 1 of 30
+        self.assertEqual(stats.percentage_elapsed, 0)
+
+    def test_custom_target_clamped_future_start(self):
+        # If start date was accidentally set in future, clamp to today
+        today = date(2026, 9, 24)
+        target = date(2026, 10, 24)
+        future_start = date(2026, 9, 28)
+
+        stats = get_date_stats(
+            target_date=today,
+            date_mode="custom",
+            custom_target_date=target,
+            custom_start_date=future_start,
+            event_title=""
+        )
+
+        self.assertEqual(stats.days_remaining, 30)
+        self.assertEqual(stats.total_days, 30)
+        self.assertEqual(stats.day_of_year, 1)
+
 if __name__ == "__main__":
     unittest.main()

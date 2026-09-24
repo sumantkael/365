@@ -262,6 +262,7 @@ class DaySettingsApp(tk.Tk):
         self.date_mode_var = tk.StringVar(value=self.settings.get("date_mode", "year"))
         self.target_date_str_var = tk.StringVar(value=self.settings.get("target_date", ""))
         self.target_title_var = tk.StringVar(value=self.settings.get("target_title", ""))
+        self._last_valid_target_date = parse_user_date(self.target_date_str_var.get())
         self.mode_var = tk.StringVar(value=self.settings.get("mode", "both"))
         self.theme_var = tk.StringVar(value=self.current_theme_name)
         self.wallpaper_font_var = tk.StringVar(value=self.settings.get("wallpaper_font", "geist"))
@@ -471,8 +472,18 @@ class DaySettingsApp(tk.Tk):
         self.title_entry.pack(fill="x")
         self.title_entry.bind("<KeyRelease>", self._on_target_input_changed)
 
-        self.date_status_lbl = tk.Label(self.custom_date_frame, text="", font=("Geist Mono", 8), fg=t["text_muted"], bg=t["bg"])
-        self.date_status_lbl.pack(anchor="w", padx=14, pady=(2, 10))
+        status_row = tk.Frame(self.custom_date_frame, bg=t["bg"])
+        status_row.pack(fill="x", padx=14, pady=(2, 10))
+
+        self.date_status_lbl = tk.Label(status_row, text="", font=("Geist Mono", 8), fg=t["text_muted"], bg=t["bg"])
+        self.date_status_lbl.pack(side="left")
+
+        self.reset_start_btn = tk.Button(
+            status_row, text="⟲ Reset Start to Today", font=("Geist Sans", 7, "bold"),
+            bg=t["btn_bg"], fg=t["text_muted"], activebackground=t["btn_hover"], activeforeground=t["text_main"],
+            relief="flat", bd=0, padx=6, pady=1, cursor="hand2", command=self._reset_start_to_today
+        )
+        self.reset_start_btn.pack(side="right")
 
         # Wallpaper Styles
         mode_hdr = tk.Label(inner, text="WALLPAPER DISPLAY STYLE", font=("Geist Sans", 8, "bold"), fg=t["text_dim"], bg=t["card"])
@@ -583,9 +594,21 @@ class DaySettingsApp(tk.Tk):
         )
 
     def _on_date_picked(self, chosen: date):
+        today = date.today()
         formatted = chosen.strftime("%d %B %Y")
+        self._last_valid_target_date = chosen
+        # When user chooses any custom target date, starting point is from today
+        self.settings.set("target_start_date", today.isoformat())
+        self.settings.set("target_date", formatted)
         self.target_date_str_var.set(formatted)
-        self._on_target_input_changed()
+        self._validate_and_display_custom_date()
+        self.update_preview()
+
+    def _reset_start_to_today(self):
+        today = date.today()
+        self.settings.set("target_start_date", today.isoformat())
+        self._validate_and_display_custom_date()
+        self.update_preview()
 
     def _on_theme_changed(self):
         theme_name = self.theme_var.get()
@@ -606,11 +629,23 @@ class DaySettingsApp(tk.Tk):
         self._auto_size_window()
 
     def _on_target_input_changed(self, event=None):
-        self._validate_and_display_custom_date()
+        target_str = self.target_date_str_var.get().strip()
+        parsed = parse_user_date(target_str)
+        today = date.today()
+
+        # If user changed to a new target date, start from today
+        if parsed:
+            if not hasattr(self, "_last_valid_target_date") or parsed != self._last_valid_target_date:
+                self._last_valid_target_date = parsed
+                self.settings.set("target_start_date", today.isoformat())
+        if not self.settings.get("target_start_date"):
+            self.settings.set("target_start_date", today.isoformat())
+
         self.settings.update(
             target_date=self.target_date_str_var.get(),
             target_title=self.target_title_var.get()
         )
+        self._validate_and_display_custom_date()
         self.update_preview()
 
     def _validate_and_display_custom_date(self):
@@ -627,16 +662,27 @@ class DaySettingsApp(tk.Tk):
         if parsed:
             today = date.today()
             delta = (parsed - today).days
+            start_str = self.settings.get("target_start_date", "")
+            start_dt = parse_user_date(start_str) if start_str else today
+            if start_dt is None or start_dt > today:
+                start_dt = today
+                self.settings.set("target_start_date", today.isoformat())
+
             if delta >= 0:
-                self.date_status_lbl.config(
-                    text=f"✓ Target: {parsed.strftime('%B %d, %Y')} • {delta} days remaining from today",
-                    fg=t["status_ok"]
-                )
-                if not self.settings.get("target_start_date"):
-                    self.settings.set("target_start_date", today.isoformat())
+                stats = self._calculate_current_stats()
+                if start_dt == today:
+                    self.date_status_lbl.config(
+                        text=f"✓ Target: {parsed.strftime('%d %B %Y')} • Starts today • {stats.total_days} days total ({stats.days_remaining} days left)",
+                        fg=t["status_ok"]
+                    )
+                else:
+                    self.date_status_lbl.config(
+                        text=f"✓ Target: {parsed.strftime('%d %B %Y')} • Started: {start_dt.strftime('%d %b %Y')} • Day {stats.day_of_year} of {stats.total_days} ({stats.days_remaining} days left)",
+                        fg=t["status_ok"]
+                    )
             else:
                 self.date_status_lbl.config(
-                    text=f"Notice: {parsed.strftime('%B %d, %Y')} is in the past ({abs(delta)} days ago)",
+                    text=f"Notice: {parsed.strftime('%d %B %Y')} is in the past ({abs(delta)} days ago)",
                     fg=t["status_err"]
                 )
         else:

@@ -35,6 +35,10 @@ class DateStats:
             if self.start_date > self.target_date:
                 self.start_date = self.target_date
 
+            # Ensure start_date <= today so countdown never starts in the future
+            if self.start_date > self.today:
+                self.start_date = self.today
+
             self.days_remaining = max(0, (self.target_date - self.today).days)
             self.is_past = self.today >= self.target_date
 
